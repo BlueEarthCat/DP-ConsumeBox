@@ -7,6 +7,7 @@ import com.darksoldier1404.dppc.api.inventory.DInventory;
 import com.darksoldier1404.dppc.lang.DLang;
 import com.darksoldier1404.dppc.utils.NBT;
 import com.darksoldier1404.dppc.utils.Quadruple;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,6 +18,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import static com.blueearthcat.dpcb.box.enums.BoxType.*;
@@ -113,6 +115,7 @@ public class DPCBEvent implements Listener {
                         datas.setD(datas.getD() + 1);
                         e.getClickedInventory().setItem(e.getSlot(), null);
                         updateCurrentPage2(inv, datas.getB(), datas.getD());
+                        inv.setPageContent(inv.getCurrentPage(), inv.getContents());
                         inv.update();
                     }
                 } else {
@@ -127,6 +130,7 @@ public class DPCBEvent implements Listener {
                         inv.setItem(e.getSlot(), getSelectedItem());
                         datas.setD(datas.getD() - 1);
                         updateCurrentPage2(inv, datas.getB(), datas.getD());
+                        inv.setPageContent(inv.getCurrentPage(), inv.getContents());
                         inv.update();
                     }
                     if (NBT.hasTagKey(item, "dpcb_select")){
@@ -134,25 +138,30 @@ public class DPCBEvent implements Listener {
                             p.sendMessage(prefix + lang.get("box_not_selected"));
                             return;
                         }
-                        ItemStack[] items = datas.getA();
-                        int j = 0;
-                        for (ItemStack i : items){
-                            if (i== null) continue;
-                            if (NBT.hasTagKey(i, "dpcb_number")){
-                                items[j] = NBT.removeTag(i, "dpcb_number");
-                            }
-                            j++;
-                        }
-                        for (int i = 0; i < p.getInventory().getStorageContents().length; i++) {
-                            if(p.getInventory().getStorageContents()[i] == null) continue;
-                            p.getInventory().setItem(i, null);
-                        }
-                        for (ItemStack i : items) {
-                            if (i != null){
-                                if (i == datas.getC()) i.setAmount(i.getAmount() - 1);
-                                p.getInventory().addItem(i);
+                        ItemStack[] backup = datas.getA();
+                        for(ItemStack bi : backup) { //backup에서 쿠폰 1개 제거
+                            if(bi == null) continue;
+                            if(NBT.hasTagKey(bi, "dpcb_coupon") && NBT.getStringTag(bi, "dpcb_coupon").equalsIgnoreCase(datas.getB())) {
+                                bi.setAmount(bi.getAmount() -1);
                             }
                         }
+                        ItemStack[] items = p.getInventory().getStorageContents().clone();
+                        for (int i = 0; i < items.length; i++){ //선택 시작 ~ 선택 중에 있던 인벤토리 아이템 필터
+                            if (items[i]== null) continue;
+                            if (NBT.hasTagKey(items[i], "dpcb_number")){
+                                items[i] = NBT.removeTag(items[i], "dpcb_number");
+                            }
+                            if (NBT.hasTagKey(items[i],  "ban")){
+                                items[i] = null;
+                            }
+                        }
+                        Inventory pinv = Bukkit.createInventory(null, 36);
+                        pinv.setContents(backup);
+                        for(ItemStack sel : items) { //선택된 아이템 지급
+                            if(sel == null) continue;
+                            pinv.addItem(sel);
+                        }
+                        p.getInventory().setStorageContents(pinv.getStorageContents());
                         datas.setA(null);
                         p.closeInventory();
                         p.sendMessage(prefix + datas.getB() + lang.get("box_select_give"));
@@ -180,36 +189,16 @@ public class DPCBEvent implements Listener {
         if (inv.getChannel() == 3){
             if (inv.getObj() == null) return;
             Quadruple<ItemStack[], String, ItemStack, Integer> datas = (Quadruple<ItemStack[], String, ItemStack, Integer>) inv.getObj();
-            if (datas.getA() == null) return;
-            else {
-                if (datas.getD() == 0) {
-                    ItemStack[] items = datas.getA();
-                    int j = 0;
-                    for (ItemStack i : items){
-                        if (i== null) continue;
-                        if (NBT.hasTagKey(i, "dpcb_number")){
-                            items[j] = NBT.removeTag(i, "dpcb_number");
-                        }
-                        j++;
-                    }
-                    for (int i = 0; i < p.getInventory().getStorageContents().length; i++) {
-                        if(p.getInventory().getStorageContents()[i] == null) continue;
-                        p.getInventory().setItem(i, null);
-                    }
-                    for (ItemStack i : items) {
-                        if (i != null){
-                            if (i == datas.getC()) i.setAmount(i.getAmount() - 1);
-                            p.getInventory().addItem(i);
-                        }
-                    }
-                    p.sendMessage(prefix + lang.get("box_select_give"));
-                } else {
-                    p.getInventory().clear();
-                    for (ItemStack i : datas.getA()) {
-                        if (i != null) p.getInventory().addItem(i);
-                    }
-                    p.sendMessage(prefix + lang.get("box_selected_cancel"));
+            if (datas.getA() != null) {
+
+                for (int i = 0; i < p.getInventory().getStorageContents().length; i++) {
+                    if(p.getInventory().getStorageContents()[i] == null) continue;// was using clone
+                    p.getInventory().setItem(i, null);
                 }
+                for(int i = 0; i < datas.getA().length; i++) {
+                    p.getInventory().setItem(i, datas.getA()[i]);
+                }
+                p.sendMessage(prefix + lang.get("box_selected_cancel"));
             }
         }
     }

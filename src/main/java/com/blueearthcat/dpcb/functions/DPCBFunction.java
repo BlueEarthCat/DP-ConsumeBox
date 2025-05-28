@@ -255,8 +255,7 @@ public class DPCBFunction {
         inv.setPageTools(pageTools);
         ItemStack[] playercontents = new ItemStack[36];
         for (int i = 0; i < p.getInventory().getStorageContents().length; i++) {
-            if(p.getInventory().getStorageContents()[i] == null) continue;
-            playercontents[i] = p.getInventory().getStorageContents()[i].clone();
+            playercontents[i] = p.getInventory().getStorageContents()[i]; // was using clone
             p.getInventory().setItem(i, null);
         }
         inv.setObj(new Quadruple(playercontents, name, cp, box.getDrops()));
