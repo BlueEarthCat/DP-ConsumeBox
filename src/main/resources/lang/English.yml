@@ -1,0 +1,57 @@
+Lang: English
+
+#Commands
+
+help_create: "/dpcb create <name> <type> - Creates a reward box."
+help_item: "/dpcb item <name> - Sets the rewards of the reward box."
+help_coupon: "/dpcb coupon <name> - Sets the coupon item of the reward box."
+help_type: "/dpcb type <name> random/select/gift - Changes the type of the reward box to random/select/gift. (Default: gift)"
+help_give: "/dpcb give <name> (player) - Gives a reward box to a player."
+help_list: "/dpcb list - Displays the list of reward boxes."
+help_delete: "/dpcb delete <name> - Deletes a reward box."
+help_reload: "/dpcb reload - Reloads the config settings."
+help_drop: "/dpcb drop <name> <amount> - Sets the number of rewards for random/select boxes. (Default: 1)"
+help_page: "/dpcb maxpage <name> <maxpage> - Sets the max page number of the reward box. (Default: 1)"
+
+# PageTools
+
+next_page: "§fNext Page"
+prev_page: "§fPrevious Page"
+current_page: "§aCurrent Page: §f"
+
+# WrongMessage
+
+box_exists: "The reward box already exists."
+box_not_exists: "The reward box does not exist!"
+box_wrong_type: "The type of the reward box is incorrectly set!"
+box_wrong_drop: "The number of rewards in the reward box is incorrectly set!"
+box_wrong_page: "The max page number of the reward box is incorrectly set!"
+box_big_or_small_drop: "The number of rewards is too big or too small!"
+box_no_items: "There are no rewards in the reward box."
+player_has_no_space: "The inventory does not have enough space."
+player_wrong: "Invalid player name or the player is not online."
+box_max_selected: "You have exceeded the selectable reward limit!"
+box_not_selected: "You must select all rewards!"
+box_selected_cancel: "Not all rewards have been selected."
+
+# Functions & Events
+
+box_create: "Reward box has been created."
+box_item_title: "Reward Box Item Setup"
+box_set_type: "Reward box type set to: "
+box_coupon_title: "Reward Box Coupon Setup"
+box_random_give: "You received a reward from a random box!"
+box_gift_give: "You received a reward from a gift box!"
+box_select_title: "Select a reward from the selection box"
+box_select_name: "Click after selecting a reward"
+box_select_lore: "Reward selected: "
+box_give_coupon: "Gave a reward box."
+box_receive_coupon: "Received a reward box."
+box_list_title: "Reward Box List"
+box_list_name: "Reward Box Name: "
+box_select_give: "You received a reward from the selection box!"
+box_drop_set: "Set the number of rewards in the reward box."
+box_page_set: "Set the max page number of the reward box."
+box_reload: "Config reloaded."
+box_delete: " Reward Box deleted"
+
