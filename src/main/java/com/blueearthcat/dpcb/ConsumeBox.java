@@ -28,10 +28,10 @@ public class ConsumeBox extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        data = new DataContainer(plugin, true);
+        plugin.data = new DataContainer(plugin, true);
+        DPCBFunction.init();
         plugin.getServer().getPluginManager().registerEvents(new DPCBEvent(), plugin);
         getCommand("dpcb").setExecutor(new DPCBCommand().getExecuter());
-        DPCBFunction.init();
     }
 
     @Override

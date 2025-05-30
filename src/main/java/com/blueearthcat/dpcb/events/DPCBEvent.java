@@ -21,6 +21,8 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Arrays;
+
 import static com.blueearthcat.dpcb.box.enums.BoxType.*;
 import static com.blueearthcat.dpcb.functions.DPCBFunction.*;
 
@@ -92,8 +94,7 @@ public class DPCBEvent implements Listener {
                 e.setCancelled(true);
                 if (NBT.hasTagKey(e.getCurrentItem(), "dpcb_coupon")) {
                     String name = NBT.getStringTag(e.getCurrentItem(), "dpcb_coupon");
-                    p.closeInventory();
-                    DPCBFunction.setGiftBoxItem(p, name);
+                    DPCBFunction.giveGiftBox(p, name, p, true);
                 }
                 return;
             case 3: //select
@@ -103,12 +104,28 @@ public class DPCBEvent implements Listener {
                 ItemStack item = e.getCurrentItem();
                 if (NBT.hasTagKey(item, "ban")) return;
                 if (inv.getObj() == null) return;
-                Quadruple<ItemStack[], String, ItemStack, Integer> datas = (Quadruple<ItemStack[], String, ItemStack, Integer>)inv.getObj();
+                Quadruple<ItemStack[], String, ItemStack, Integer> datas = (Quadruple<ItemStack[], String, ItemStack, Integer>) inv.getObj();
 
+                if (NBT.hasTagKey(e.getCurrentItem(), "prev")) {
+                    e.setCancelled(true);
+                    ItemStack[] currentPageItems = inv.getContents();
+                    inv.setPageContent(inv.getCurrentPage(), currentPageItems);
+                    inv.prevPage();
+                    updateCurrentPage2(inv, datas.getB(), datas.getD());
+                    return;
+                }
+                if (NBT.hasTagKey(e.getCurrentItem(), "next")) {
+                    e.setCancelled(true);
+                    ItemStack[] currentPageItems = inv.getContents();
+                    inv.setPageContent(inv.getCurrentPage(), currentPageItems);
+                    inv.nextPage();
+                    updateCurrentPage2(inv, datas.getB(), datas.getD());
+                    return;
+                }
+                int page = NBT.getIntegerTag(item, "dpcb_number") / 45;
+                int slot = NBT.getIntegerTag(item, "dpcb_number") - 45 * page;
                 if (e.getClickedInventory().getType() == InventoryType.PLAYER) {
                     if (NBT.hasTagKey(item, "dpcb_number")) {
-                        int page = NBT.getIntegerTag(item, "dpcb_number") / 45;
-                        int slot = NBT.getIntegerTag(item, "dpcb_number") - 45 * page;
                         inv.setCurrentPage(page);
                         inv.setItem(slot, item);
                         item.setType(Material.AIR);
@@ -120,7 +137,6 @@ public class DPCBEvent implements Listener {
                     }
                 } else {
                     if (NBT.hasTagKey(item, "dpcb_number")) {
-                        int page = NBT.getIntegerTag(item, "dpcb_number") / 45;
                         if (datas.getD() == 0) {
                             p.sendMessage(prefix + lang.get("box_max_selected"));
                             return;
@@ -133,32 +149,32 @@ public class DPCBEvent implements Listener {
                         inv.setPageContent(inv.getCurrentPage(), inv.getContents());
                         inv.update();
                     }
-                    if (NBT.hasTagKey(item, "dpcb_select")){
-                        if (datas.getD() != 0){
+                    if (NBT.hasTagKey(item, "dpcb_select")) {
+                        if (datas.getD() != 0) {
                             p.sendMessage(prefix + lang.get("box_not_selected"));
                             return;
                         }
                         ItemStack[] backup = datas.getA();
-                        for(ItemStack bi : backup) { //backup에서 쿠폰 1개 제거
-                            if(bi == null) continue;
-                            if(NBT.hasTagKey(bi, "dpcb_coupon") && NBT.getStringTag(bi, "dpcb_coupon").equalsIgnoreCase(datas.getB())) {
-                                bi.setAmount(bi.getAmount() -1);
+                        for (ItemStack bi : backup) { //backup에서 쿠폰 1개 제거
+                            if (bi == null) continue;
+                            if (NBT.hasTagKey(bi, "dpcb_coupon") && NBT.getStringTag(bi, "dpcb_coupon").equalsIgnoreCase(datas.getB())) {
+                                bi.setAmount(bi.getAmount() - 1);
                             }
                         }
                         ItemStack[] items = p.getInventory().getStorageContents().clone();
-                        for (int i = 0; i < items.length; i++){ //선택 시작 ~ 선택 중에 있던 인벤토리 아이템 필터
-                            if (items[i]== null) continue;
-                            if (NBT.hasTagKey(items[i], "dpcb_number")){
+                        for (int i = 0; i < items.length; i++) { //선택 시작 ~ 선택 중에 있던 인벤토리 아이템 필터
+                            if (items[i] == null) continue;
+                            if (NBT.hasTagKey(items[i], "dpcb_number")) {
                                 items[i] = NBT.removeTag(items[i], "dpcb_number");
                             }
-                            if (NBT.hasTagKey(items[i],  "ban")){
+                            if (NBT.hasTagKey(items[i], "ban")) {
                                 items[i] = null;
                             }
                         }
                         Inventory pinv = Bukkit.createInventory(null, 36);
                         pinv.setContents(backup);
-                        for(ItemStack sel : items) { //선택된 아이템 지급
-                            if(sel == null) continue;
+                        for (ItemStack sel : items) { //선택된 아이템 지급
+                            if (sel == null) continue;
                             pinv.addItem(sel);
                         }
                         p.getInventory().setStorageContents(pinv.getStorageContents());
@@ -167,8 +183,10 @@ public class DPCBEvent implements Listener {
                         p.sendMessage(prefix + datas.getB() + lang.get("box_select_give"));
                     }
 
+                    return;
+
                 }
-                return;
+
             default:
                 break;
         }
@@ -180,22 +198,24 @@ public class DPCBEvent implements Listener {
         DInventory inv = (DInventory) e.getInventory();
         Player p = (Player) e.getPlayer();
         if (!inv.isValidHandler(plugin)) return;
-        if (inv.getChannel() == 0) { // item edit mode save
+        if (inv.getChannel() == 0) {// item edit mode save
+            ItemStack[] currentPageItems = inv.getContents();
+            inv.setPageContent(inv.getCurrentPage(), currentPageItems);
             DPCBFunction.saveBoxItems((Player) e.getPlayer(), (String) inv.getObj(), inv);
         }
         if (inv.getChannel() == 1) {
             DPCBFunction.saveCouponItem((Player) e.getPlayer(), (String) inv.getObj(), inv);
         }
-        if (inv.getChannel() == 3){
+        if (inv.getChannel() == 3) {
             if (inv.getObj() == null) return;
             Quadruple<ItemStack[], String, ItemStack, Integer> datas = (Quadruple<ItemStack[], String, ItemStack, Integer>) inv.getObj();
             if (datas.getA() != null) {
 
                 for (int i = 0; i < p.getInventory().getStorageContents().length; i++) {
-                    if(p.getInventory().getStorageContents()[i] == null) continue;// was using clone
+                    if (p.getInventory().getStorageContents()[i] == null) continue;// was using clone
                     p.getInventory().setItem(i, null);
                 }
-                for(int i = 0; i < datas.getA().length; i++) {
+                for (int i = 0; i < datas.getA().length; i++) {
                     p.getInventory().setItem(i, datas.getA()[i]);
                 }
                 p.sendMessage(prefix + lang.get("box_selected_cancel"));

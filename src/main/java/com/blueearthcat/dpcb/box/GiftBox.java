@@ -1,16 +1,16 @@
 package com.blueearthcat.dpcb.box;
 
+import com.blueearthcat.dpcb.ConsumeBox;
 import com.blueearthcat.dpcb.box.enums.BoxType;
 import com.darksoldier1404.dppc.api.inventory.DInventory;
+import com.darksoldier1404.dppc.lang.DLang;
 import com.darksoldier1404.dppc.utils.NBT;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.*;
 
 public class GiftBox implements Cloneable{
     private String name;
@@ -19,7 +19,7 @@ public class GiftBox implements Cloneable{
     private Map<Integer, ItemStack[]> items; // <page, pageContent>
     private int maxPage = 0;
     private ItemStack couponItem = new ItemStack(Material.PAPER);
-
+    private static final int NAV_BAR_SIZE = 9;
 
     public GiftBox() {
     }
@@ -28,15 +28,25 @@ public class GiftBox implements Cloneable{
         this.name = name;
         this.type = type;
         items = new HashMap<>();
+        setDefaultCouponItem(name, couponItem);
     }
-
     public GiftBox(String name, BoxType type, int drops) {
         this.name = name;
         this.type = type;
         this.drops = drops;
         items = new HashMap<>();
+        setDefaultCouponItem(name, couponItem);
     }
 
+    public void setDefaultCouponItem(String name, ItemStack item){
+        ItemMeta im = item.getItemMeta();
+        final DLang lang = ConsumeBox.getInstance().data.getLang();
+        im.setDisplayName(name + lang.get("default_coupon_name"));
+        List<String> lore = new ArrayList<>();
+        lore.add(lang.get("default_coupon_lore"));
+        im.setLore(lore);
+        item.setItemMeta(im);
+    }
     public ItemStack getCouponItem() {
         return NBT.setStringTag(couponItem, "dpcb_coupon", name);
     }
@@ -49,12 +59,16 @@ public class GiftBox implements Cloneable{
         return items;
     }
 
+    public void setItems(Map<Integer, ItemStack[]> items) {
+        this.items = items;
+    }
+
     public void setItems(DInventory inv) {
-        for (int i=0; i < inv.getPages() + 1; i++ ){
+        for (int i=0; i <= inv.getPages(); i++ ){
             inv.setCurrentPage(i);
             inv.update();
             ItemStack[] contents = new ItemStack[45];
-            for(int slot = 0; slot < inv.getContents().length - 9; slot++) {
+            for(int slot = 0; slot < inv.getContents().length - NAV_BAR_SIZE; slot++) {
                 contents[slot] = inv.getContents()[slot];
             }
             items.put(i, contents);
@@ -63,10 +77,6 @@ public class GiftBox implements Cloneable{
 
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public BoxType getType() {

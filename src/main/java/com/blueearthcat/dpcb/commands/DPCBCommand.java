@@ -10,7 +10,6 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class DPCBCommand {
     private final String prefix;
@@ -45,9 +44,9 @@ public class DPCBCommand {
                     p.sendMessage(prefix + lang.get("player_only"));
                     return;
                 }
-                DPCBFunction.giveGiftBox(p, args[1], (Player) p);
+                DPCBFunction.giveGiftBox(p, args[1], (Player) p, false);
             }
-            else if (args.length == 3) DPCBFunction.giveGiftBox(p, args[2],DPCBFunction.getPlayer(args[2]));
+            else if (args.length == 3) DPCBFunction.giveGiftBox(p, args[1],DPCBFunction.getPlayer(args[2]), false);
             else p.sendMessage(prefix + lang.get("help_give"));
         });
         builder.addSubCommand("list", "dpcb.list", lang.get("help_list"), true, (p, args) -> {
@@ -70,10 +69,17 @@ public class DPCBCommand {
             if (args.length == 1) DPCBFunction.reloadConfig(p);
             else p.sendMessage(prefix + lang.get("help_reload"));
         });
-        List<String> commands = Arrays.asList("create", "item", "delete", "type", "give", "coupon", "drop", "maxpage");
+        List<String> commands = Arrays.asList("create", "item", "coupon", "type", "give", "delete", "drop", "page");
         for (String c: commands) {
-            builder.addTabCompletion(c, args -> new ArrayList<>(plugin.boxes.keySet()));
+            builder.addTabCompletion(c, args -> {
+                if (args.length == 2) return new ArrayList<>(plugin.boxes.keySet());
+                else if (args.length == 3)
+                  if (c.equalsIgnoreCase("create") | c.equalsIgnoreCase("type"))
+                    return Arrays.asList("select", "random", "gift");
+                return null;
+            });
         }
+
 
     }
 

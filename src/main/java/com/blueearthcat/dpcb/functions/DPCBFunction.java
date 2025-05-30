@@ -13,7 +13,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,7 +26,6 @@ public class DPCBFunction {
     private static final String prefix = plugin.data.getPrefix();
 
     public static void init() {
-        plugin.data = new DataContainer(plugin, true);
         plugin.boxes.clear();
         for (YamlConfiguration data : ConfigUtils.loadCustomDataList(plugin, "data")) {
             GiftBox box = new GiftBox().deserialize(data);
@@ -127,6 +125,8 @@ public class DPCBFunction {
             return;
         }
         box.setType(boxtype);
+        plugin.boxes.put(name, box);
+        saveBox(box);
         p.sendMessage(prefix + name + lang.get("box_set_type") + type);
     }
 
@@ -155,6 +155,7 @@ public class DPCBFunction {
         GiftBox box = getBox(name);
         box.setCouponItem(NBT.removeTag(inv.getItem(13), "dpcb_coupon"));
         saveBox(box);
+        p.sendMessage(prefix + name + lang.get("box_coupon_save"));
     }
 
     public static void givePrize(Player p, String name, ItemStack cp) {
@@ -163,13 +164,13 @@ public class DPCBFunction {
             return;
         }
         GiftBox box = getBox(name);
-        if (box.getItems() == null) {
+        if (box.getItems() == null || box.getItems().isEmpty()) {
             p.sendMessage(prefix + lang.get("box_no_items"));
             return;
         }
         int drop = box.getDrops();
         List<ItemStack> prizes = new ArrayList<>();
-        for (int page = 0; page < box.getMaxPage() + 1; page++) {
+        for (int page = 0; page <= box.getMaxPage(); page++) {
             for (int i = 0; i < box.getItems().get(page).length; i++) {
                 if (box.getItems().get(page)[i] != null) {
                     ItemStack item = box.getItems().get(page)[i].clone();
@@ -307,7 +308,7 @@ public class DPCBFunction {
         }
     }
 
-    public static void giveGiftBox(CommandSender sender, String name, Player receiver) {
+    public static void giveGiftBox(CommandSender sender, String name, Player receiver, boolean silence) {
         if (receiver == null) {
             sender.sendMessage(prefix + lang.get("player_wrong"));
             return;
@@ -323,6 +324,7 @@ public class DPCBFunction {
             return;
         }
         receiver.getInventory().addItem(item);
+        if (silence) return;
         sender.sendMessage(prefix + name + lang.get("box_give_coupon"));
         receiver.sendMessage(prefix + name + lang.get("box_receive_coupon"));
     }
@@ -363,7 +365,7 @@ public class DPCBFunction {
         box.setItems(inv);
         plugin.boxes.put(name, box);
         saveBox(box);
-        p.sendMessage(prefix + lang.get("box_item_save"));
+        p.sendMessage(prefix + name + lang.get("box_item_save"));
     }
 
     public static void updateCurrentPage(DInventory inv) {
@@ -387,6 +389,7 @@ public class DPCBFunction {
         im.setLore(lore);
         cpage.setItemMeta(im);
         inv.setPageTools(tools);
+        inv.update();
     }
 
     public static void deleteGiftBox(Player p, String name) {
@@ -396,7 +399,7 @@ public class DPCBFunction {
         }
         plugin.boxes.remove(name);
         new File(plugin.getDataFolder() + "/data/" + name + ".yml").delete();
-        p.sendMessage(prefix + lang.get("box_delete"));
+        p.sendMessage(prefix + name + lang.get("box_delete"));
     }
 
     public static void setGiftBoxDrop(Player p, String name, String var) {
@@ -415,15 +418,17 @@ public class DPCBFunction {
         GiftBox box = getBox(name);
         Map<Integer, ItemStack[]> items = box.clone().getItems();
         int size = 0;
-        if (items != null) {
+        if (items != null | !items.isEmpty()) {
             size = items.get(box.getMaxPage()).length;
         }
         int maxSize = box.getMaxPage() * 45 + size;
-        if (drop <= 0 && drop > maxSize) {
+        if (drop <= 0 || drop > maxSize) {
             p.sendMessage(prefix + lang.get("box_big_or_small_drop"));
             return;
         }
         box.setDrops(drop);
+        plugin.boxes.put(name, box);
+        saveBox(box);
         p.sendMessage(prefix + name + lang.get("box_drop_set"));
 
     }
@@ -432,6 +437,10 @@ public class DPCBFunction {
         int page;
         try {
             page = Integer.parseInt(var);
+            if (page < 0){
+                p.sendMessage(prefix + lang.get("box_wrong_page"));
+                return;
+            }
         } catch (NumberFormatException e) {
             p.sendMessage(prefix + lang.get("box_wrong_page"));
             return;
@@ -441,13 +450,23 @@ public class DPCBFunction {
             return;
         }
         GiftBox box = getBox(name);
+        Map<Integer, ItemStack[]> items = box.getItems();
+        if (page < box.getMaxPage()) {
+            for (int i = box.getMaxPage(); i > page; i--) {
+                items.remove(i);
+            }
+        }
+        box.setItems(items);
         box.setMaxPage(page);
+        plugin.boxes.put(name, box);
+        saveBox(box);
         p.sendMessage(prefix + name + lang.get("box_page_set"));
 
     }
 
     public static void reloadConfig(CommandSender p) {
         plugin.data.reload();
+        init();
         p.sendMessage(prefix + lang.get("box_reload"));
     }
 }
