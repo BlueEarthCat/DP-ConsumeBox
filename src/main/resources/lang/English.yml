@@ -9,7 +9,6 @@ help_type: "/dpcb type <name> random/select/gift - Changes the type of the rewar
 help_give: "/dpcb give <name> (player) - Gives a reward box to a player."
 help_list: "/dpcb list - Displays the list of reward boxes."
 help_delete: "/dpcb delete <name> - Deletes a reward box."
-help_reload: "/dpcb reload - Reloads the config settings."
 help_drop: "/dpcb drop <name> <amount> - Sets the number of rewards for random/select boxes. (Default: 1)"
 help_page: "/dpcb page <name> <maxpage> - Sets the max page number of the reward box. (Default: 1)"
 
