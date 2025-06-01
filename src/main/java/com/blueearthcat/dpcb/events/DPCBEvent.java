@@ -73,6 +73,7 @@ public class DPCBEvent implements Listener {
                     inv.setPageContent(inv.getCurrentPage(), currentPageItems);
                     inv.prevPage();
                     DPCBFunction.updateCurrentPage(inv);
+                    inv.update();
                     return;
                 }
                 if (NBT.hasTagKey(e.getCurrentItem(), "next")) {
@@ -81,6 +82,7 @@ public class DPCBEvent implements Listener {
                     inv.setPageContent(inv.getCurrentPage(), currentPageItems);
                     inv.nextPage();
                     DPCBFunction.updateCurrentPage(inv);
+                    inv.update();
                     return;
                 }
                 return;
@@ -112,6 +114,7 @@ public class DPCBEvent implements Listener {
                     inv.setPageContent(inv.getCurrentPage(), currentPageItems);
                     inv.prevPage();
                     updateCurrentPage2(inv, datas.getB(), datas.getD());
+                    inv.update();
                     return;
                 }
                 if (NBT.hasTagKey(e.getCurrentItem(), "next")) {
@@ -120,6 +123,7 @@ public class DPCBEvent implements Listener {
                     inv.setPageContent(inv.getCurrentPage(), currentPageItems);
                     inv.nextPage();
                     updateCurrentPage2(inv, datas.getB(), datas.getD());
+                    inv.update();
                     return;
                 }
                 int page = NBT.getIntegerTag(item, "dpcb_number") / 45;
@@ -133,7 +137,6 @@ public class DPCBEvent implements Listener {
                         e.getClickedInventory().setItem(e.getSlot(), null);
                         updateCurrentPage2(inv, datas.getB(), datas.getD());
                         inv.setPageContent(inv.getCurrentPage(), inv.getContents());
-                        inv.update();
                     }
                 } else {
                     if (NBT.hasTagKey(item, "dpcb_number")) {
@@ -148,7 +151,6 @@ public class DPCBEvent implements Listener {
                         datas.setD(datas.getD() - 1); //Drop 값 감소
                         updateCurrentPage2(inv, datas.getB(), datas.getD()); //페이지 도구 변경
                         inv.setPageContent(inv.getCurrentPage(), inv.getContents());
-                        inv.update();
                     }
                     if (NBT.hasTagKey(item, "dpcb_select")) {
                         if (datas.getD() != 0) {

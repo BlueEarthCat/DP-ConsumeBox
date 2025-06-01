@@ -390,7 +390,6 @@ public class DPCBFunction {
         im.setLore(lore);
         cpage.setItemMeta(im);
         inv.setPageTools(tools);
-        inv.update();
     }
 
     public static void deleteGiftBox(Player p, String name) {
