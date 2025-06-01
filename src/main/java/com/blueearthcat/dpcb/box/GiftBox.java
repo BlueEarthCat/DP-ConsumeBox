@@ -64,15 +64,7 @@ public class GiftBox implements Cloneable{
     }
 
     public void setItems(DInventory inv) {
-        for (int i=0; i <= inv.getPages(); i++ ){
-            inv.setCurrentPage(i);
-            inv.update();
-            ItemStack[] contents = new ItemStack[45];
-            for(int slot = 0; slot < inv.getContents().length - NAV_BAR_SIZE; slot++) {
-                contents[slot] = inv.getContents()[slot];
-            }
-            items.put(i, contents);
-        }
+        items = inv.getPageItemsWithoutTools();
     }
 
     public String getName() {
