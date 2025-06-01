@@ -22,11 +22,13 @@ import java.util.*;
 @SuppressWarnings("static-access")
 public class DPCBFunction {
     private static final ConsumeBox plugin = ConsumeBox.getInstance();
-    private static final DLang lang = plugin.data.getLang();
-    private static final String prefix = plugin.data.getPrefix();
+    private static DLang lang;
+    private static String prefix;
 
     public static void init() {
         plugin.boxes.clear();
+        lang = plugin.data.getLang();
+        prefix = plugin.data.getPrefix();
         for (YamlConfiguration data : ConfigUtils.loadCustomDataList(plugin, "data")) {
             GiftBox box = new GiftBox().deserialize(data);
             plugin.boxes.put(box.getName(), box);
@@ -464,9 +466,4 @@ public class DPCBFunction {
 
     }
 
-    public static void reloadConfig(CommandSender p) {
-        plugin.data.reload();
-        init();
-        p.sendMessage(prefix + lang.get("box_reload"));
-    }
 }

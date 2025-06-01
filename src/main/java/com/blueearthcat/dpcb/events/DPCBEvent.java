@@ -27,9 +27,9 @@ import static com.blueearthcat.dpcb.box.enums.BoxType.*;
 import static com.blueearthcat.dpcb.functions.DPCBFunction.*;
 
 public class DPCBEvent implements Listener {
-    private final ConsumeBox plugin = ConsumeBox.getInstance();
-    private final String prefix = plugin.data.getPrefix();
-    private final DLang lang = plugin.data.getLang();
+    private static ConsumeBox plugin = ConsumeBox.getInstance();
+    private static String prefix = plugin.data.getPrefix();
+    private static DLang lang = plugin.data.getLang();
 
     @EventHandler
     public void onInteract(PlayerInteractEvent e) {
@@ -144,12 +144,12 @@ public class DPCBEvent implements Listener {
                             p.sendMessage(prefix + lang.get("box_max_selected"));
                             return;
                         }
-                        p.getInventory().addItem(item); //플레이어에게 지급
-                        inv.setCurrentPage(page); //현재 페이지 설정
-                        inv.setItem(e.getSlot(), getSelectedItem()); //클릭한 슬롯의 아이템 변경
+                        p.getInventory().addItem(item);
+                        inv.setCurrentPage(page);
+                        inv.setItem(e.getSlot(), getSelectedItem());
                         System.out.println("Clicked Slot : " + e.getSlot());
-                        datas.setD(datas.getD() - 1); //Drop 값 감소
-                        updateCurrentPage2(inv, datas.getB(), datas.getD()); //페이지 도구 변경
+                        datas.setD(datas.getD() - 1);
+                        updateCurrentPage2(inv, datas.getB(), datas.getD());
                         inv.setPageContent(inv.getCurrentPage(), inv.getContents());
                     }
                     if (NBT.hasTagKey(item, "dpcb_select")) {

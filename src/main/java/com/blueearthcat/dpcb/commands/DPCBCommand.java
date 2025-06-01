@@ -12,14 +12,11 @@ import java.util.Arrays;
 import java.util.List;
 
 public class DPCBCommand {
-    private final String prefix;
-    private final ConsumeBox plugin = ConsumeBox.getInstance();
-    private final DLang lang;
+    private static ConsumeBox plugin = ConsumeBox.getInstance();
+    private static String prefix = plugin.data.getPrefix();
+    private static DLang lang = plugin.data.getLang();
     private final CommandBuilder builder;
-
     public DPCBCommand() {
-        prefix = plugin.data.getPrefix();
-        lang = plugin.data.getLang();
         builder = new CommandBuilder(prefix);
 
         builder.addSubCommand("create", "dpcb.create", lang.get("help_create"), true, (p, args) -> {
@@ -64,10 +61,6 @@ public class DPCBCommand {
         builder.addSubCommand("page", "dpcb.page", lang.get("help_page"), true, (p, args) -> {
             if (args.length == 3) DPCBFunction.setGiftBoxPage((Player)p, args[1], args[2]);
             else p.sendMessage(prefix + lang.get("help_page"));
-        });
-        builder.addSubCommand("reload", "dpcb.reload", lang.get("help_reload"), false, (p, args) -> {
-            if (args.length == 1) DPCBFunction.reloadConfig(p);
-            else p.sendMessage(prefix + lang.get("help_reload"));
         });
         List<String> commands = Arrays.asList("create", "item", "coupon", "type", "give", "delete", "drop", "page");
         for (String c: commands) {
