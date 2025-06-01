@@ -141,11 +141,12 @@ public class DPCBEvent implements Listener {
                             p.sendMessage(prefix + lang.get("box_max_selected"));
                             return;
                         }
-                        p.getInventory().addItem(item);
-                        inv.setCurrentPage(page);
-                        inv.setItem(e.getSlot(), getSelectedItem());
-                        datas.setD(datas.getD() - 1);
-                        updateCurrentPage2(inv, datas.getB(), datas.getD());
+                        p.getInventory().addItem(item); //플레이어에게 지급
+                        inv.setCurrentPage(page); //현재 페이지 설정
+                        inv.setItem(e.getSlot(), getSelectedItem()); //클릭한 슬롯의 아이템 변경
+                        System.out.println("Clicked Slot : " + e.getSlot());
+                        datas.setD(datas.getD() - 1); //Drop 값 감소
+                        updateCurrentPage2(inv, datas.getB(), datas.getD()); //페이지 도구 변경
                         inv.setPageContent(inv.getCurrentPage(), inv.getContents());
                         inv.update();
                     }

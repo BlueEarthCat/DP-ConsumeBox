@@ -171,6 +171,7 @@ public class DPCBFunction {
         int drop = box.getDrops();
         List<ItemStack> prizes = new ArrayList<>();
         for (int page = 0; page <= box.getMaxPage(); page++) {
+            if (box.getItems().get(page) == null) continue;
             for (int i = 0; i < box.getItems().get(page).length; i++) {
                 if (box.getItems().get(page)[i] != null) {
                     ItemStack item = box.getItems().get(page)[i].clone();
