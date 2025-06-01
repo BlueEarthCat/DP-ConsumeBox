@@ -21,8 +21,6 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
-
 import static com.blueearthcat.dpcb.box.enums.BoxType.*;
 import static com.blueearthcat.dpcb.functions.DPCBFunction.*;
 

@@ -57,7 +57,6 @@ DP-ConsumeBox는 커스터마이징 가능한 보상 상자 플러그인입니�
 | `/dpcb list`                | 보상 상자 목록을 확인하는 GUI를 엽니다. (GUI에서 해당 보상 상자를 클릭하면 본인에게 지급됩니다.) |
 | `/dpcb drop <name> <drop>`  | 보상 상자의 보상 갯수를 설정합니다. (기본 값 : 1, 보상 아이템이 설정되어 있어야 함.)        |
 | `/dpcb page <name> <page>`  | 보상 상자의 최대 페이지를 설정합니다. (기본 값 : 0)                            |
-| `/dpcb reload`              | config 설정 파일을 다시 불러옵니다.                                     |
 **주의사항**: 페이지는 0부터 시작입니다. 본인이 설정하고 싶은 최대 페이지에 -1을 한 값을 사용하십시오. 
  ex) 설정하고 싶은 최대 페이지 : 2 => 명령어 사용 : `/dpcb page test 1`
 
@@ -71,7 +70,6 @@ DP-ConsumeBox는 커스터마이징 가능한 보상 상자 플러그인입니�
 - `dpcb.list`: 보상 상자 목록 확인 권한.
 - `dpcb.drop`: 보상 상자 보상 갯수 설정 권한.
 - `dpcb.page`: 보상 상자 최대 페이지 설정 권한.
-- `dpcb.reload`: 보상 상자 Config 리로드 권한.
 
 ## 사용법 예시
 - 보상 상자 생성: `/dpcb create test random`
@@ -82,7 +80,6 @@ DP-ConsumeBox는 커스터마이징 가능한 보상 상자 플러그인입니�
 - 보상 상자 최대 페이지 설정: `/dpcb page test 1`
 - 보상 상자 목록 확인: `/dpcb list`
 - 보상 상자 지급: `/dpcb give test (playerName)`
-- Config 리로드: `/dpcb reload`
 
 
 </details>
@@ -125,7 +122,6 @@ it can be easily used for everything from event rewards to cosmetic item distrib
 | `/dpcb list`                   | Opens a GUI to view the list of reward boxes. (Clicking a box in the GUI grants it to the player.) |
 | `/dpcb drop <name> <drop>`     | Sets the number of rewards for a reward box. (Default: 1, requires reward items to be set.) |
 | `/dpcb page <name> <page>`     | Sets the maximum page for a reward box. (Default: 0)                        |
-| `/dpcb reload`                 | Reloads the configuration file.                                             |
 **Note**: Pages start from 0. Use the desired maximum page number minus 1.  
 Example: Desired maximum page = 2 → Command: `/dpcb page test 1`
 
@@ -139,7 +135,6 @@ Example: Desired maximum page = 2 → Command: `/dpcb page test 1`
 - `dpcb.list`: Permission to view the reward box list.
 - `dpcb.drop`: Permission to set the number of rewards for a reward box.
 - `dpcb.page`: Permission to set the maximum page for a reward box.
-- `dpcb.reload`: Permission to reload the reward box configuration.
 
 ## Usage Examples
 - Create a reward box: `/dpcb create test random`
@@ -150,7 +145,6 @@ Example: Desired maximum page = 2 → Command: `/dpcb page test 1`
 - Set the maximum page for a reward box: `/dpcb page test 1`
 - View the reward box list: `/dpcb list`
 - Grant a reward box: `/dpcb give test (playerName)`
-- Reload configuration: `/dpcb reload`
 </details>
 
 <br>

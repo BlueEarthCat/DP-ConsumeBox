@@ -4,7 +4,6 @@ import com.blueearthcat.dpcb.box.GiftBox;
 import com.blueearthcat.dpcb.commands.DPCBCommand;
 import com.blueearthcat.dpcb.events.DPCBEvent;
 import com.blueearthcat.dpcb.functions.DPCBFunction;
-import com.darksoldier1404.dppc.lang.DLang;
 import com.darksoldier1404.dppc.utils.DataContainer;
 import com.darksoldier1404.dppc.utils.PluginUtil;
 import org.bukkit.plugin.java.JavaPlugin;
